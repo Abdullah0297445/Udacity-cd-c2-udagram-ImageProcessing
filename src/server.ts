@@ -1,7 +1,6 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
-import { filter } from 'bluebird';
 
 (async () => {
 
@@ -21,19 +20,18 @@ import { filter } from 'bluebird';
   // RETURNS
   //   the filtered image file
   app.get("/filteredimage",
-    async (req, res) => {
+    async (req: Request, res: Response) => {
       const url = req.query.image_url
       if (!url) {
         res.status(400).send('image_url missing.')
       }
-      console.log(url);
       const path = await filterImageFromURL(url)
       if (path !== "err") {
         res.sendFile(path, () => {
           deleteLocalFiles([path]);
         });
       } else {
-        res.status(400).send("Image not found.")
+        res.status(404).send("Image not found.")
       }
     });
   
